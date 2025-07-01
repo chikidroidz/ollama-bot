@@ -48,103 +48,91 @@ const ChatBot: React.FC<ChatBotProps> = ({
     }, speed);
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    setError(null);
+const handleSend = async () => {
+  if (!input.trim()) return;
+  setError(null);
 
-    // Add user message
-    const userMessageId = ++messageId.current;
-    const userText = input;
-    setMessages((prev) => [
-      ...prev,
-      { id: userMessageId, from: "user", text: userText },
-    ]);
+  // Add user message
+  const userMessageId = ++messageId.current;
+  const userText = input;
+  setMessages((prev) => [
+    ...prev,
+    { id: userMessageId, from: "user", text: userText },
+  ]);
 
-    // Add placeholder for bot typing
-    const typingMessageId = ++messageId.current;
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: typingMessageId,
-        from: "bot",
-        text: "buBot is thinking...",
-        typing: true,
-      },
-    ]);
+  // Add placeholder for bot typing
+  const typingMessageId = ++messageId.current;
+  setMessages((prev) => [
+    ...prev,
+    {
+      id: typingMessageId,
+      from: "bot",
+      text: "buBot is thinking...",
+      typing: true,
+    },
+  ]);
 
-    setInput("");
-    setLoading(true);
+  setInput("");
+  setLoading(true);
 
-    try {
-      const res = await axios.post(apiEndpoint, {
-        model: modelName,
-        prompt: userText,
-        stream: false,
-      });
+  try {
+    const res = await axios.post(apiEndpoint, {
+      model: modelName,
+      prompt: userText,
+      stream: false,
+    });
 
-      const botReply = res.data.response || "Sorry, no response from API.";
+    const botReply = res.data.response || "Sorry, no response from API.";
 
-      // Simulate typing
-      simulateTyping(
-        botReply,
-        (partialText) => {
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === typingMessageId ? { ...msg, text: partialText } : msg
-            )
-          );
-        },
-        () => {
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === typingMessageId ? { ...msg, typing: false } : msg
-            )
-          );
-        }
-      );
-    } catch (e: any) {
-      console.error("API Error:", e);
-      if (e.response) {
-        console.error("Response data:", e.response.data);
-        console.error("Response status:", e.response.status);
-        setError(`API error ${e.response.status}: ${JSON.stringify(e.response.data)}`);
-      } else if (e.request) {
-        console.error("No response received:", e.request);
-        setError("No response received from server.");
-      } else {
-        console.error("Request setup error:", e.message);
-        setError(`Request setup error: ${e.message}`);
-      }
-    }
-
-
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === typingMessageId
-            ? {
-                ...msg,
-                text: "Error: Could not get response.",
-                typing: false,
-              }
-            : msg
-        )
-      );
-
-      if (e.response) {
-        setError(
-          `Failed: ${e.response.status} - ${
-            e.response.data?.error || e.message
-          }`
+    // Simulate typing
+    simulateTyping(
+      botReply,
+      (partialText) => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === typingMessageId ? { ...msg, text: partialText } : msg
+          )
         );
-      } else if (e.request) {
-        setError("No response from server. Check network or server status.");
-      } else {
-        setError(`Request failed: ${e.message}`);
+      },
+      () => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === typingMessageId ? { ...msg, typing: false } : msg
+          )
+        );
       }
-    } finally {
-      setLoading(false);
+    );
+  } catch (e: any) {
+    console.error("API Error:", e);
+    if (e.response) {
+      console.error("Response data:", e.response.data);
+      console.error("Response status:", e.response.status);
+      setError(`API error ${e.response.status}: ${JSON.stringify(e.response.data)}`);
+    } else if (e.request) {
+      console.error("No response received:", e.request);
+      setError("No response received from server.");
+    } else {
+      console.error("Request setup error:", e.message);
+      setError(`Request setup error: ${e.message}`);
     }
-  };
+
+    // Update bot message to show error
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === typingMessageId
+          ? {
+              ...msg,
+              text: "Error: Could not get response.",
+              typing: false,
+            }
+          : msg
+      )
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="flex flex-col max-w-4xl mx-auto h-[650px] border border-gray-800 rounded-lg shadow-lg bg-gray-950 text-gray-100 font-sans">
