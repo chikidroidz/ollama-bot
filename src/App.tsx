@@ -1,7 +1,7 @@
 import ChatBot from "./components/ChatBot";
 
 export default function App() {
-  const ollamaApiUrl = "https://ca5a-2a02-4780-10-9c36-00-1.ngrok-free.app/api/generate";
+  const ollamaApiUrl = "https://67b0-2a02-4780-10-9c36-00-1.ngrok-free.app/api/generate";
 
   return (
     <div className="App bg-gray-900 min-h-screen text-gray-100 flex flex-col">
