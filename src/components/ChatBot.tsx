@@ -107,11 +107,16 @@ const ChatBot: React.FC<ChatBotProps> = ({
       if (e.response) {
         console.error("Response data:", e.response.data);
         console.error("Response status:", e.response.status);
+        setError(`API error ${e.response.status}: ${JSON.stringify(e.response.data)}`);
       } else if (e.request) {
         console.error("No response received:", e.request);
+        setError("No response received from server.");
       } else {
         console.error("Request setup error:", e.message);
+        setError(`Request setup error: ${e.message}`);
       }
+    }
+
 
       setMessages((prev) =>
         prev.map((msg) =>
