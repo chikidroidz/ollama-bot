@@ -104,6 +104,14 @@ const ChatBot: React.FC<ChatBotProps> = ({
       );
     } catch (e: any) {
       console.error("API Error:", e);
+      if (e.response) {
+        console.error("Response data:", e.response.data);
+        console.error("Response status:", e.response.status);
+      } else if (e.request) {
+        console.error("No response received:", e.request);
+      } else {
+        console.error("Request setup error:", e.message);
+      }
 
       setMessages((prev) =>
         prev.map((msg) =>
